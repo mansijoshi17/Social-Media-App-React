@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -9,6 +9,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { withRouter } from "react-router-dom";
+import firebase from '../firebase-config';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,6 +29,24 @@ const useStyles = makeStyles((theme) => ({
 function Appbar({ history }) {
     const classes = useStyles();
 
+    const [user, setuser] = useState(null);
+
+    useEffect(() => {
+        authListener();
+    }, [])
+
+    //This function is get that user is currently signed in or not....
+    function authListener() {
+        firebase.auth.onAuthStateChanged((user) => {
+            if (user) {
+                setuser(user);
+            }
+            else {
+                setuser(user);
+            }
+        })
+    }
+
     return (
         <div className={classes.root}>
             <AppBar position="static">
@@ -39,8 +58,9 @@ function Appbar({ history }) {
                         Mansi Joshi
           </Typography>
                     <Button color="inherit" onClick={() => history.push('/signup')}>Sign Up</Button>
-                    <Button color="inherit" onClick={() => history.push('/signin')} > Sign In</Button>
-                    <Button color="inherit"><AccountCircle className={classes.icon} /></Button>
+                    {/* Bellow line check if user is signed in than show sign out option otherwise sign in option  */}
+                    {user ? <Button color="inherit" onClick={() => firebase.auth.signOut()} > Sign Out</Button> : <Button color="inherit" onClick={() => history.push('/signin')}> Sign In</Button>}
+                    {user ? <Button color="inherit" onClick={() => history.push('/profile')}><AccountCircle className={classes.icon} /></Button> : null}
                 </Toolbar>
             </AppBar>
         </div>

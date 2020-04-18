@@ -1,30 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { withRouter } from 'react-router-dom';
+import firebase from '../firebase-config';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -46,8 +33,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+function SignUp({history}) {
   const classes = useStyles();
+
+  const [FirstName, setFirstName] = useState('');
+  const [LastName, setLastName] = useState('');
+  const [Email, setEmail] = useState('');
+  const [Password, setPassword] = useState('');
+
+  const displayName = FirstName+ " " + LastName;
+
+
+  const SignUp = () => {
+    try {
+     firebase.signup(displayName, Email, Password);
+      history.push('/');
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -64,13 +68,15 @@ export default function SignUp() {
             <Grid item xs={12} sm={6}>
               <TextField
                 autoComplete="fname"
-                name="firstName"
+                name="setFirstName"
                 variant="outlined"
                 required
                 fullWidth
                 id="firstName"
                 label="First Name"
+                value={FirstName}
                 autoFocus
+                onChange={(event) => setFirstName(event.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -80,8 +86,10 @@ export default function SignUp() {
                 fullWidth
                 id="lastName"
                 label="Last Name"
+                value={LastName}
                 name="lastName"
                 autoComplete="lname"
+                onChange={(event) => setLastName(event.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -91,8 +99,10 @@ export default function SignUp() {
                 fullWidth
                 id="email"
                 label="Email Address"
+                value={Email}
                 name="email"
                 autoComplete="email"
+                onChange={(event) => setEmail(event.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -102,9 +112,11 @@ export default function SignUp() {
                 fullWidth
                 name="password"
                 label="Password"
+                value={Password}
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(event) => setPassword(event.target.value)}
               />
             </Grid>
           </Grid>
@@ -114,6 +126,7 @@ export default function SignUp() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={SignUp}
           >
             Sign Up
           </Button>
@@ -130,3 +143,5 @@ export default function SignUp() {
     </Container>
   );
 }
+
+export default withRouter(SignUp);
