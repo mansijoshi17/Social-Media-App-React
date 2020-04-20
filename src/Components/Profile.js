@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -9,7 +9,16 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
 import firebase from '../firebase-config';
+import { withRouter } from 'react-router-dom'
+
 
 
 const useStyles = makeStyles({
@@ -22,27 +31,82 @@ const useStyles = makeStyles({
     },
 });
 
-export default function Profile() {
+function Profile({ history }) {
     const classes = useStyles();
+    var user = firebase.auth.currentUser ? firebase.auth.currentUser : 'User'; //currently logged in user...
 
-    var user = firebase.auth.currentUser;
+    const [open, setOpen] = React.useState(false);
+    const [opend2, setOpend2] = React.useState(false);
 
-    // console.log("user",user);
+    const [dname, setdname] = useState(user.displayName)//its by default shows firstname and lastname
+    const [photourl, setphotourl] = useState(user.photoURL);//its take by default photo url..
 
 
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClickOpend2 = () => {
+        setOpend2(true);
+    };//Dialogbox 2
+
+    const handelchange = (event) => {
+        setphotourl(URL.createObjectURL(event.target.files[0]))
+    }//This is for get the image for photourl
+
+
+    const handleSave = () => {
+        user.updateProfile({
+            displayName: dname,
+            photoURL: photourl
+        })//updated the displayname and photourl on save button..
+        setOpen(false);
+        console.log(user);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleClosed2 = () => {
+        setOpend2(false);
+    };//Dialogbox 2
+
+    const handledelete = () => {
+        user.delete().then(function () {
+            history.push('/');
+        }).catch(function (error) {
+            console.log(error);
+        });
+    };//Dialogbox 2
+
+
+    const [Followers, setFollowers] = useState(0);
+
+    //get all the users from collection and filter email of currently logged in user and get the number of followers except lgged user from list...
+    firebase.databse.ref('users').once("value").then((snap) => {
+        const filtered = Object.keys(snap.val())
+            .filter(key => snap.val()[key].email !== user.email)
+            .map((i) => {
+                return i;
+            })
+
+        setFollowers(filtered.length);
+    })
 
     return (
         <Card className={classes.root}>
             <CardActionArea>
                 <CardMedia
                     className={classes.media}
-                    image="data:image/png;base64,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"
+                    image={photourl}
                     title="Contemplative Reptile"
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                        {user.displayName ? user.displayName : ''}
-          </Typography>
+                        {dname}
+                        {/* shows display name above */}
+                    </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
                         Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
                         across all continents except Antarctica
@@ -50,16 +114,78 @@ export default function Profile() {
                 </CardContent>
             </CardActionArea>
             <CardActions>
+
                 <Button size="small" color="primary">
                     FOLLOWERS
-        </Button>
-                <Button size="small" color="primary">
+                    <p>({Followers})</p>
+                </Button>
+                <Button size="small" color="primary" onClick={handleClickOpen}>
                     EDIT<EditIcon />
                 </Button>
-                <Button size="small" color="primary">
+                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Edit Profile</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            To update display name and profile photo enter display name and upload photo here.
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="displayname"
+                            label="Display Name"
+                            type="text"
+                            fullWidth
+                            value={dname}
+                            onChange={(event) => setdname(event.target.value)}
+                        />
+                        <Button
+                            variant="contained"
+                            component="label"
+                        >Upload Photo
+                        <input
+                                type="file"
+                                onChange={(event) => handelchange(event)}
+                                style={{ display: "none" }}
+                            />
+                        </Button>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSave} color="primary">
+                            Save
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Button size="small" color="primary" onClick={handleClickOpend2}>
                     DELETE<DeleteIcon />
                 </Button>
+                <Dialog
+                    open={opend2}
+                    keepMounted
+                    onClose={handleClosed2}
+                    aria-labelledby="alert-dialog-slide-title"
+                    aria-describedby="alert-dialog-slide-description"
+                >
+                    <DialogTitle id="alert-dialog-slide-title">{"Are you sure?"}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-slide-description">
+                            Are you sure? you want to delete this account?
+          </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClosed2} color="primary">
+                            Cancel
+          </Button>
+                        <Button onClick={handledelete} color="primary">
+                            Delete
+          </Button>
+                    </DialogActions>
+                </Dialog>
             </CardActions>
         </Card>
     );
 }
+
+export default withRouter(Profile);

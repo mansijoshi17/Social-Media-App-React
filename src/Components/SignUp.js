@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SignUp({history}) {
+function SignUp({ history }) {
   const classes = useStyles();
 
   const [FirstName, setFirstName] = useState('');
@@ -41,15 +41,15 @@ function SignUp({history}) {
   const [Email, setEmail] = useState('');
   const [Password, setPassword] = useState('');
 
-  const displayName = FirstName+ " " + LastName;
+  const displayName = FirstName + " " + LastName;
 
 
   const SignUp = () => {
     try {
-     firebase.signup(displayName, Email, Password);
+      firebase.signup(displayName, Email, Password, FirstName, LastName);
       history.push('/');
     } catch (error) {
-      console.log(error);
+      console.log("error",error);
     }
   }
 

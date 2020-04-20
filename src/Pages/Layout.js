@@ -6,7 +6,6 @@ import SignUpPage from './SignUpPage';
 import SignInPage from './SignInPage';
 import ProfilePage from './ProfilePage';
 
-
 function Layout() {
     return (
         <div>
@@ -20,7 +19,7 @@ function Layout() {
                         <SignInPage />
                     </Route>
                     <Route path="/profile">
-                    <ProfilePage />
+                        <ProfilePage />
                     </Route>
                 </div>
             </Router>

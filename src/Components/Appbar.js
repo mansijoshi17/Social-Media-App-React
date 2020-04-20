@@ -8,6 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
+
 import { withRouter } from "react-router-dom";
 import firebase from '../firebase-config';
 
@@ -59,7 +60,11 @@ function Appbar({ history }) {
           </Typography>
                     <Button color="inherit" onClick={() => history.push('/signup')}>Sign Up</Button>
                     {/* Bellow line check if user is signed in than show sign out option otherwise sign in option  */}
-                    {user ? <Button color="inherit" onClick={() => firebase.auth.signOut()} > Sign Out</Button> : <Button color="inherit" onClick={() => history.push('/signin')}> Sign In</Button>}
+                    {user ? <Button color="inherit" onClick={() => {
+                               firebase.auth.signOut();
+                               history.push('/');
+
+                    }} > Sign Out</Button> : <Button color="inherit" onClick={() => history.push('/signin')}> Sign In</Button>}
                     {user ? <Button color="inherit" onClick={() => history.push('/profile')}><AccountCircle className={classes.icon} /></Button> : null}
                 </Toolbar>
             </AppBar>

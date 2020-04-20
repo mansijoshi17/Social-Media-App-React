@@ -1,4 +1,5 @@
 import React from 'react';
+import firebase from 'firebase';
 import app from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firebase-firestore';
@@ -19,8 +20,9 @@ class Firebase extends React.Component {
         super();
         app.initializeApp(firebaseConfig);
         this.auth = app.auth();
-        this.db = app.firestore;
+        this.databse = firebase.database();
     }
+
 
     signin(email, password) {
         return this.auth.signInWithEmailAndPassword(email, password);
@@ -30,11 +32,17 @@ class Firebase extends React.Component {
         return this.auth.signOut();
     }
 
-    async signup(name, email, password) {
+    async signup(name, email, password, firstname, lastname) {
         await this.auth.createUserWithEmailAndPassword(email, password);
         return this.auth.currentUser.updateProfile({
             displayName: name
-        })
+        }),
+            this.databse.ref('users').push({
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                password: password,
+            })
     }
 }
 
