@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
-
+import { connect } from 'react-redux';
 import { withRouter } from "react-router-dom";
 import firebase from '../firebase-config';
 
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function Appbar({ history }) {
+function Appbar({ history, changeUser }) {
     const classes = useStyles();
 
     const [user, setuser] = useState(null);
@@ -41,12 +41,14 @@ function Appbar({ history }) {
         firebase.auth.onAuthStateChanged((user) => {
             if (user) {
                 setuser(user);
+                changeUser(user)
             }
             else {
                 setuser(user);
             }
         })
     }
+
 
     return (
         <div className={classes.root}>
@@ -56,13 +58,14 @@ function Appbar({ history }) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                        Mansi Joshi
+                        Social App
           </Typography>
+                    <Button color="inherit" onClick={() => history.push('/')}>Home</Button>
                     <Button color="inherit" onClick={() => history.push('/signup')}>Sign Up</Button>
                     {/* Bellow line check if user is signed in than show sign out option otherwise sign in option  */}
                     {user ? <Button color="inherit" onClick={() => {
-                               firebase.auth.signOut();
-                               history.push('/');
+                        firebase.auth.signOut();
+                        history.push('/');
 
                     }} > Sign Out</Button> : <Button color="inherit" onClick={() => history.push('/signin')}> Sign In</Button>}
                     {user ? <Button color="inherit" onClick={() => history.push('/profile')}><AccountCircle className={classes.icon} /></Button> : null}
@@ -72,4 +75,10 @@ function Appbar({ history }) {
     );
 }
 
-export default withRouter(Appbar);
+const mapDispatchToProps = (dispatch) => {
+    return {
+      changeUser: (user) => { dispatch({ type: "CHANGE_USER", payload: user }) }
+    }
+  }
+
+export default withRouter(connect(null,mapDispatchToProps)(Appbar));

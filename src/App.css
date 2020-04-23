@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+
+.MuiPaper-root.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm.MuiPaper-elevation24.MuiPaper-rounded {
+  width: 700px;
+  height: 700px;
+}

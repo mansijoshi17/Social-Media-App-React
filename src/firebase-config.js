@@ -20,7 +20,7 @@ class Firebase extends React.Component {
         super();
         app.initializeApp(firebaseConfig);
         this.auth = app.auth();
-        this.databse = firebase.database();
+        this.db = firebase.database();
     }
 
 
@@ -37,12 +37,44 @@ class Firebase extends React.Component {
         return this.auth.currentUser.updateProfile({
             displayName: name
         }),
-            this.databse.ref('users').push({
+            this.db.ref('users').push({
                 firstname: firstname,
                 lastname: lastname,
                 email: email,
                 password: password,
             })
+    }
+
+    AddPost(displayname, title, photourl, description, createdat) {
+        var newPostKey = this.db.ref().child('posts').push().key;//This generate unquie key id in every post.
+        this.db.ref('posts').push({
+            id : newPostKey,
+            displayName: displayname,
+            title: title,
+            photourl: photourl,
+            description: description,
+            createdAt: createdat
+        })
+    }
+
+    deleteuser(userid) {
+        return this.db.ref('users').child(`${userid}`).remove();//this remove current user from users database.
+    }
+
+    AddComments(Id,Comment,displayname,profileimg){
+        return this.db.ref(`posts/${Id}/comments`).push({
+            Comment : Comment,
+            displayName : displayname,
+            profileimg : profileimg
+        });
+    }
+
+    AddLikes(Id,Like){
+         return this.db.ref(`posts/${Id}/Likes`).push(Like);
+    }
+
+    deletepost(postid){
+        return this.db.ref('posts').child(`${postid}`).remove();//this remove clicked post from posts database.
     }
 }
 

@@ -16,6 +16,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+
 import firebase from '../firebase-config';
 import { withRouter } from 'react-router-dom'
 
@@ -48,7 +49,7 @@ function Profile({ history }) {
 
     const handleClickOpend2 = () => {
         setOpend2(true);
-    };//Dialogbox 2
+    };//Dialogbox 2(delete)
 
     const handelchange = (event) => {
         setphotourl(URL.createObjectURL(event.target.files[0]))
@@ -70,21 +71,30 @@ function Profile({ history }) {
 
     const handleClosed2 = () => {
         setOpend2(false);
-    };//Dialogbox 2
+    };//Dialogbox 2(delete)
 
     const handledelete = () => {
+        var childId;
+        firebase.db.ref('users').once("value").then((snap) => {
+            Object.keys(snap.val())
+                .filter(key => snap.val()[key].email === user.email)
+                .map((i) => {
+                    childId = i;
+                })
+        })
         user.delete().then(function () {
+            firebase.deleteuser(childId);//Its call deleteuser function from firebase config file.
             history.push('/');
         }).catch(function (error) {
             console.log(error);
         });
-    };//Dialogbox 2
+    };//Dialogbox 2(delete)
 
 
     const [Followers, setFollowers] = useState(0);
 
     //get all the users from collection and filter email of currently logged in user and get the number of followers except lgged user from list...
-    firebase.databse.ref('users').once("value").then((snap) => {
+    firebase.db.ref('users').once("value").then((snap) => {
         const filtered = Object.keys(snap.val())
             .filter(key => snap.val()[key].email !== user.email)
             .map((i) => {

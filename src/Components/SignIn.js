@@ -45,7 +45,7 @@ function SignIn({ history }) {
   const SignIn = () => {
     try {
       firebase.signin(Email, Password);
-      history.push('/');
+      history.push('/postlist');
     } catch (error) {
       console.log(error);
     }

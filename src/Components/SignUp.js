@@ -47,7 +47,7 @@ function SignUp({ history }) {
   const SignUp = () => {
     try {
       firebase.signup(displayName, Email, Password, FirstName, LastName);
-      history.push('/');
+      history.push('/postlist');
     } catch (error) {
       console.log("error",error);
     }
